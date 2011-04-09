@@ -10,21 +10,41 @@ var HEIGHT=200;
 
 var img_s1=null;
 var img_s2=null;
+var img_d=null;
+var data_s1;
+var data_s2;
+var data_d;
+
+var CA=0;
 function do_test() {
 	img_s1=ctx_s1.getImageData(0,0,WIDTH,HEIGHT);
 	img_s2=ctx_s2.getImageData(0,0,WIDTH,HEIGHT);
-	var data1=img_s1.data;
-	//var data2=img_s2.data;
-	
-	for(var i=0;i<data1.length;i+=4){
-		//for(var j=0;j<3;j++){
-			//data1[i+j]=data1[i+j]*0.5+data2[i+j];
-		//}
-		data1[i+3]=120;
-	}
-	ctx_d.putImageData(img_s1,0,0);
+	img_d=ctx_s2.getImageData(0,0,WIDTH,HEIGHT);//ctx_s2.createImageData(WIDTH,HEIGHT);
+	data_s1=img_s1.data;
+	data_s2=img_s2.data;
+	data_d=img_d.data;
+	 
+	test_loop();
 }
-
+function test_loop(){
+	var alpha=CA/255;
+	for(var i=0;i<data_d.length;i+=4){
+ 		for(var j=0;j<3;j++){
+ 				data_d[i+j]=Math.round(data_s2[i+j]*alpha+data_s1[i+j]*(1-alpha));
+ 		}
+	}
+	ctx_d.putImageData(img_d,0,0);
+	//$.dprint('loop');
+	CA+=5;
+	if(CA<255){
+		setTimeout(test_loop,10);
+	}else if(CA>255){
+		CA=255;
+		test_loop();
+	}else{
+		CA=0;
+	}
+}
 $( function() {
 
 	c_s1 = $.$('canvas_src_1');
