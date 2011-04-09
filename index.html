@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Abe's Page</title>
+		<script type='text/javascript' src='js/jquery-1.5.1.js'>
+		</script>
+		<script type="text/javascript" src='js/js-oo.js'>
+		</script>
+		<script type='text/javascript' src='js/slide.js'>
+		</script>
+		<script type='text/javascript' src='js/slide_animates.js'>
+		</script>
+		<script type='text/javascript' src='js/fz_nimate.js'>
+		</script>
+		<script type='text/javascript' src='js/index.js'>
+		</script>
+		<style>
+			body{
+				text-align: center;
+			}
+	.canvas_src {
+		border:1px solid blue;
+		margin: 10px;
+	}
+	.canvas_dest {
+		border:1px solid green;
+		position: relative;
+		top:-100px;
+	}
+	.row{
+		display: inline-block;
+		height:100%;
+	}
+	#btn_test {
+		position: relative;
+		top:-180px;
+	}
+		</style>
+	</head>
+	<body>
+		<div id='main'>
+			<div class='row'>
+			<div>
+				<canvas class='canvas_src' id='canvas_src_1'>
+					<canvas>
+			</div>
+			<div>
+				<canvas class='canvas_src' id='canvas_src_2'>
+				</canvas>
+			</div>
+		</div>
+		<div class='row'>
+			<input type='button' onclick='do_test();' value='TEST' id='btn_test' disabled="true"/>
+		</div>
+		<div class='row'>
+			<canvas class="canvas_dest" id='canvas_dest'></canvas>
+		</div>
+			
+		</div>
+		
+	</body>
+</html>
