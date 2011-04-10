@@ -2,7 +2,7 @@
  * @author Abraham
  */
 if(!Abe){
-	throw 'Slide.js needed!'; 
+	throw 'slide.js needed!'; 
 }
 Abe.FZAnimate=function(width,height){
 	this.base(width,height);

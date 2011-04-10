@@ -4,7 +4,7 @@
  * Email:abraham1@163.com
  */
 if(typeof Abe==="undefined"){
-	throw "need Slide.js";
+	throw "need slide.js";
 }
 /**
  * 幻灯片转换动画父类

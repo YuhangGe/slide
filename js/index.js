@@ -11,31 +11,31 @@ window.onload=function(){
     s= new Abe.Slide(canvas, 400, 300,true);
 
 	var i=[ {title: 'Chrysanthemum',
-        src: 'images/Chrysanthemum.jpg',
+        src: 'images/1.jpg',
         url: 'http://www.nju.edu.cn'
     }, {
 		title: 'Hydrangeas',
-		src: 'images/Hydrangeas.jpg',
+		src: 'images/2.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
 		title: 'Lighthouse',
-		src: 'images/Lighthouse.jpg',
+		src: 'images/3.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
 		title: 'Penguins',
-		src: 'images/Penguins.jpg',
+		src: 'images/4.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
 		title: 'Tulips',
-		src: 'images/Tulips.jpg',
+		src: 'images/5.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
 		title: 'Koala',
-		src: 'images/Koala.jpg',
+		src: 'images/6.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
 		title: 'Desert',
-		src: 'images/Desert.jpg',
+		src: 'images/7.jpg',
 		url: 'http://www.nju.edu.cn'
 	}];
     s.loadImages(i); 
