@@ -49,11 +49,36 @@ Abe.SlideAnimate.prototype = {
      */
     renderNextFrame: function(sender){
         throw "This method must be overrided!";
+    },
+    _drawImage:function(ctx,image,strength){
+    	if(strength){
+    		ctx.drawImage(image,0,0,this._width,this._height);
+    	}else{
+    		var i_w=image.width;
+			var i_h=image.height;
+			var x,y,w,h;
+			if(this._width/this._height>i_w/i_h){
+				var tmp=this._height/i_h;
+				var tmp_w=tmp*i_w;
+				x=(this._width-tmp_w)/2;
+				y=0;
+				w=tmp_w;
+				h=this._height;
+			}else{
+				var tmp=this._width/i_w;
+				var tmp_h=tmp*i_h;
+				y=(this._height-tmp_h)/2;
+				x=0;
+				w=this._width;
+				h=tmp_h;
+			}
+    		ctx.drawImage(image,x,y,w,h);
+    	}
     }
 }
 Abe.CircleAnimate = function(width, height){
     this.base(width, height)
-    this._maxR = 30;
+    this._maxR = 25;
     this._curR = 0;
     this._step = 3;
 	this._rows=Math.floor(height/this._maxR/2)+1;
@@ -84,10 +109,7 @@ Abe.CircleAnimate.prototype = {
         this._curR += this._step;
         if (this._curR >=this._maxR+5) 
             this._curR = this._maxR+5;
-		if(sender.strength)
-			sender.midContext.drawImage(sender.curImage,0,0,this._width,this._height);
-		else
-			sender.midContext.drawImage(sender.curImage,0,0);
+        this._drawImage(sender.midContext,sender.curImage,sender.strength);
 		
         for (var i = 0; i < this._rows; i++) {
             for (var j = 0; j < this._cols; j++) {
@@ -100,11 +122,9 @@ Abe.CircleAnimate.prototype = {
         sender.midContext.globalCompositeOperation='destination-in'
 
 		sender.midContext.drawImage(sender.maskCanvas,0,0);
-        	
-		if(sender.strength)
-			sender.context.drawImage(sender.preImage,0,0,this._width,this._height);
-		else
-			sender.context.drawImage(sender.preImage,0,0);
+        
+        this._drawImage(sender.context,sender.preImage,sender.strength);	
+
 		sender.context.drawImage(sender.midCanvas,0,0);
 		if (this._curR === this._maxR+5) {
             this._hasNextFrame = false;
@@ -133,18 +153,14 @@ Abe.FadeAnimate.prototype={
             this._opacity = 1;
 		
 		sender.midContext.globalAlpha=this._opacity
-		if(sender.strength)
-			sender.midContext.drawImage(sender.curImage,0,0,this._width,this._height);
-		else
-			sender.midContext.drawImage(sender.curImage,0,0);
+		this._drawImage(sender.midContext,sender.curImage,sender.strength);
+
 		
         sender.context.globalAlpha=1-this._opacity;
-		if(sender.strength)
-			sender.context.drawImage(sender.preImage,0,0,this._width,this._height);
-		else
-			sender.context.drawImage(sender.preImage,0,0);
+		this._drawImage(sender.context,sender.preImage,sender.strength);
 		sender.context.globalAlpha=1;
-		sender.context.drawImage(sender.midCanvas,0,0);
+		this._drawImage(sender.context,sender.midCanvas,sender.strength);
+		//sender.context.drawImage(sender.midCanvas,0,0);
 		if (this._opacity === 1) {
             this._hasNextFrame = false;
         }

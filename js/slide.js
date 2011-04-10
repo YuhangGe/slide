@@ -9,9 +9,9 @@ var Abe = {};
  *
  * @param {Object} canvas
  * @param {Number} width 画布宽度,可忽略,如果忽略，在调用loadImages前
- * 可以调用setSize设置，否则将使用第一张图片的宽高作为画面的宽高.
+ * 可以调用setSize设置，否则将使用canvas的默认宽高作为画面的宽高.
  * @param {Number} height 画面高度,可忽略,同上.
- * @param {Boolean} stren 是否根据width和height强致伸缩图片
+ * @param {Boolean} stren 是否根据width和height强致伸缩图片，如果为false，会把图片绘制在canvas中间
  */
 Abe.Slide = function(canvas,width,height,stren) {
 	if (typeof canvas === 'string')
@@ -55,12 +55,13 @@ Abe.Slide = function(canvas,width,height,stren) {
 	this._slideArray = new Array();
 	this._curSlideIndex = 0;
 
-	this._sizeSetted=false;
 
 	if(typeof width==='number' && typeof height==='number') {
 		this.setSize(width,height);
+	}else{
+		this.setSize(this._canvas.width,this._canvas.height);
 	}
-	//this._addDefaultSlides();
+
 }
 Abe.Slide.prototype = {
 	setSpeed: function(speed) {
@@ -71,7 +72,6 @@ Abe.Slide.prototype = {
 	setSize: function(width, height) {
 		this._width=width;
 		this._height=height;
-		this._sizeSetted=true;
 		//debug.print('size: '+width+','+height);
 		this._canvas.width = width;
 		this._canvas.height = height;
@@ -82,14 +82,18 @@ Abe.Slide.prototype = {
 	},
 	//增加默认的幻灯片切换特效,现在只有两种，期待你增加更多
 	_addDefaultSlides: function() {
-		var s = new Abe.CircleAnimate(this._width,this._height);
-
 		this._slideArray.push(new Abe.FadeAnimate(this._width,this._height));
-		this._slideArray.push(s);
-		//this._slideArray.push(new Abe.FZAnimate(this._width,this._height));
+		this._slideArray.push(new Abe.CircleAnimate(this._width,this._height));
 	},
-	addSlideAnimate: function(slide) {
-		this._slideArray.push(slide);
+	/**
+	 * @param [string] slide_name 
+	 */
+	addSlideAnimate: function(slide_name) {
+		if(typeof Abe[slide_name]==='function'){
+			$.dprint(slide_name);
+			this._slideArray.push(new Abe[slide_name](this._width,this._height));
+		}
+		
 	},
 	/**
  	*
@@ -108,14 +112,41 @@ Abe.Slide.prototype = {
 		this._loadNext();
 	},
 	_loadFirstImage: function() {
-		if(!this._sizeSetted)
-			this.setSize(this._buffer[0].width,this._buffer[0].height);
-		this._context.drawImage(this._buffer[0], 0, 0);
+
 		this._curImgIndex = 0;
 		this._curSlideIndex = 0;
 		this._addDefaultSlides();
+		
+		this._drawImage(this._buffer[0]);
+		
+	},
+	_drawImage:function(image){
+		if(this._stren){
+			this._context.drawImage(image,0,0,this._width,this._height);
+		}else{
+			var i_w=image.width;
+			var i_h=image.height;
+			var x,y,w,h;
+			if(this._width/this._height>i_w/i_h){
+				var tmp=this._height/i_h;
+				var tmp_w=tmp*i_w;
+				x=(this._width-tmp_w)/2;
+				y=0;
+				w=tmp_w;
+				h=this._height;
+			}else{
+				var tmp=this._width/i_w;
+				var tmp_h=tmp*i_h;
+				y=(this._height-tmp_h)/2;
+				x=0;
+				w=this._width;
+				h=tmp_h;
+			}
+			this._context.drawImage(image,x,y,w,h);
+		}
 	},
 	_drawNext: function() {
+		//$.dprint('draw');
 		var cslide = this._slideArray[this._curSlideIndex];
 		this._refreshContext();
 		if (cslide.hasNextFrame()) {
@@ -125,11 +156,7 @@ Abe.Slide.prototype = {
 		} else {
 			//this._refreshContext();
 			var img=this._buffer[this._curImgIndex];
-			if(this._stren) {
-				//debug.print('draw strength');
-				this._context.drawImage(img,0,0,this._width,this._height);
-			} else
-				this._context.drawImage(img,0,0);
+			this._drawImage(img);
 			setTimeout($.proxy(this._switchImage,this), this._speed);
 		}
 
@@ -150,14 +177,13 @@ Abe.Slide.prototype = {
 		this._sender.curImage = this._buffer[this._curImgIndex];
 
 		len = this._slideArray.length;
-		//this._curSlideIndex++;
-		//if (this._curSlideIndex >= len)
-		//this._curSlideIndex = 0;
+
 		this._curSlideIndex=Math.floor(Math.random()*len);
 		this._slideArray[this._curSlideIndex].startAnimate();
 		this._drawNext();
 	},
 	_loadImageFinish: function() {
+		//$.dprint('limgf');
 		this._switchImage();
 	},
 	_loadNext: function() {

@@ -2,14 +2,17 @@ var canvas = null;
  var s=null;
 
 
-
 window.onload=function(){
 
-
+	var s_width=300;
+	var s_height=400;
+	
     canvas = $.$('canvas');
-    
-    s= new Abe.Slide(canvas, 400, 300,true);
-
+    canvas.width=300;
+    canvas.height=400;
+    s= new Abe.Slide(canvas,null,null,true);//(, s_width,s_height,true);
+	//s.addSlideAnimate('TestAnimate');
+	
 	var i=[ {title: 'Chrysanthemum',
         src: 'images/1.jpg',
         url: 'http://www.nju.edu.cn'
@@ -27,15 +30,20 @@ window.onload=function(){
 		url: 'http://www.nju.edu.cn'
 	},{
 		title: 'Tulips',
-		src: 'images/5.jpg',
-		url: 'http://www.nju.edu.cn'
-	},{
-		title: 'Koala',
 		src: 'images/6.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
-		title: 'Desert',
+		title: 'Koala',
 		src: 'images/7.jpg',
+		url: 'http://www.nju.edu.cn'
+	},{
+		title: 'Desert',
+		src: 'images/8.jpg',
+		url: 'http://www.nju.edu.cn'
+	},
+	{
+		title: 'Desert',
+		src: 'images/10.jpg',
 		url: 'http://www.nju.edu.cn'
 	}];
     s.loadImages(i); 
