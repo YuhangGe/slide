@@ -55,10 +55,9 @@ Abe.Slide = function(canvas,width,height,stren) {
 	this._slideArray = new Array();
 	this._curSlideIndex = 0;
 
-
 	if(typeof width==='number' && typeof height==='number') {
 		this.setSize(width,height);
-	}else{
+	} else {
 		this.setSize(this._canvas.width,this._canvas.height);
 	}
 
@@ -82,18 +81,26 @@ Abe.Slide.prototype = {
 	},
 	//增加默认的幻灯片切换特效,现在只有两种，期待你增加更多
 	_addDefaultSlides: function() {
-		this._slideArray.push(new Abe.FadeAnimate(this._width,this._height));
-		this._slideArray.push(new Abe.CircleAnimate(this._width,this._height));
+		this.addSlideAnimate(['PushAnimate']);
 	},
 	/**
-	 * @param [string] slide_name 
-	 */
+ 	* @param [string | Array] slide_name
+ 	*/
 	addSlideAnimate: function(slide_name) {
-		if(typeof Abe[slide_name]==='function'){
-			$.dprint(slide_name);
-			this._slideArray.push(new Abe[slide_name](this._width,this._height));
+		if(slide_name instanceof Array===true) {
+			for(var i=0;i<slide_name.length;i++){
+				if(typeof Abe[slide_name[i]]==='function') {
+					//$.dprint(slide_name);
+					this._slideArray.push(new Abe[slide_name[i]](this._width,this._height));
+				}
+			}
+		} else {
+			if(typeof Abe[slide_name]==='function') {
+				//$.dprint(slide_name);
+				this._slideArray.push(new Abe[slide_name](this._width,this._height));
+			}
 		}
-		
+
 	},
 	/**
  	*
@@ -116,25 +123,25 @@ Abe.Slide.prototype = {
 		this._curImgIndex = 0;
 		this._curSlideIndex = 0;
 		this._addDefaultSlides();
-		
+
 		this._drawImage(this._buffer[0]);
-		
+
 	},
-	_drawImage:function(image){
-		if(this._stren){
+	_drawImage: function(image) {
+		if(this._stren) {
 			this._context.drawImage(image,0,0,this._width,this._height);
-		}else{
+		} else {
 			var i_w=image.width;
 			var i_h=image.height;
 			var x,y,w,h;
-			if(this._width/this._height>i_w/i_h){
+			if(this._width/this._height>i_w/i_h) {
 				var tmp=this._height/i_h;
 				var tmp_w=tmp*i_w;
 				x=(this._width-tmp_w)/2;
 				y=0;
 				w=tmp_w;
 				h=this._height;
-			}else{
+			} else {
 				var tmp=this._width/i_w;
 				var tmp_h=tmp*i_h;
 				y=(this._height-tmp_h)/2;
