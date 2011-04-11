@@ -9,15 +9,21 @@ if(typeof Abe==="undefined"){
  
 Abe.ClockAnimate = function(width, height){
     this.base(width, height)
-	this._tn=0;
-
+	this._angle=0;
+	this._start=Math.PI*1.5;
+	this._step=6;
+	this._pi2=Math.PI*2;
+	this._cx=this._width/2;
+	this._cy=this._height/2;
+	this._cr=Math.sqrt(this._cx*this._cx+this._cy*this._cy);
+	$.dprint("x:"+this._cx+",y:"+this._cy+",r:"+this._cr);
 }
 Abe.ClockAnimate.prototype = {
 	getSlideSpeed: function(){
-        return 500;
+        return 20;
     },
     startAnimate: function(){
-       	this._tn=0;
+       	this._angle=this._step;
         this.callBase('startAnimate');
     },
     /**
@@ -36,10 +42,26 @@ Abe.ClockAnimate.prototype = {
     renderNextFrame: function(sender){
 		if(this._hasNextFrame===false)
 			return;
-        this._tn++;
-        if(this._tn>3){
+        if(this._angle>360)
+        	this._angle=360;
+        
+        this._drawImage(sender.midContext,sender.curImage,sender.strength);
+       	sender.midContext.globalCompositeOperation='destination-in'
+ 		
+ 
+        sender.midContext.beginPath()
+        sender.midContext.moveTo(this._cx,this._cy);
+        sender.midContext.arc(this._cx,this._cy,this._cr  ,this._start,this._start+(this._angle/360*this._pi2), false);
+        sender.midContext.closePath();
+        sender.midContext.fill();
+
+        this._drawImage(sender.context,sender.preImage,sender.strength);	
+
+		sender.context.drawImage(sender.midCanvas,0,0);        
+        
+        this._angle+=this._step;
+        if(this._angle===360){
         	this._hasNextFrame=false;
-        	$.dprint('t a fini');
         }
     }
 }
