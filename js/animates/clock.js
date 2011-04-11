@@ -44,7 +44,8 @@ Abe.ClockAnimate.prototype = {
 			return;
 		if(this._angle>360)
 			this._angle=360;
-
+			
+		this._fill(sender.midContext,sender.background);
 		this._drawImage(sender.midContext,sender.curImage,sender.strength);
 		sender.midContext.globalCompositeOperation='destination-in'
 
@@ -62,7 +63,7 @@ Abe.ClockAnimate.prototype = {
 		sender.midContext.arc(this._cx,this._cy,this._cr ,from,to , false);
 		sender.midContext.closePath();
 		sender.midContext.fill();
-
+		
 		this._drawImage(sender.context,sender.preImage,sender.strength);
 
 		sender.context.drawImage(sender.midCanvas,0,0);

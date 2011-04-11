@@ -1,23 +1,24 @@
 var canvas = null;
- var s=null;
-
-
-window.onload=function(){
-
-	var s_width=300;
-	var s_height=400;
+var s=null;
+var bg=new Image();
+function do_slide(){
 	
-    canvas = $.$('canvas');
-    canvas.width=600;
-    canvas.height=500;
-    s= new Abe.Slide(canvas,null,null);
-   // s= new Abe.Slide(canvas,s_width,s_height,true);
+	var s_width=350;
+	var s_height=500;
+	canvas = $.$('canvas');
+	canvas.width=600;
+	canvas.height=500;
+	//s= new Abe.Slide(canvas);
+	s= new Abe.Slide(canvas,
+		{
+			'bgImage':bg
+		});
 	//s.addSlideAnimate('TestAnimate');
-	
+
 	var i=[ {title: 'Chrysanthemum',
-        src: 'images/1.jpg',
-        url: 'http://www.nju.edu.cn'
-    }, {
+		src: 'images/1.jpg',
+		url: 'http://www.nju.edu.cn'
+	}, {
 		title: 'Hydrangeas',
 		src: 'images/2.jpg',
 		url: 'http://www.nju.edu.cn'
@@ -47,5 +48,12 @@ window.onload=function(){
 		src: 'images/10.jpg',
 		url: 'http://www.nju.edu.cn'
 	}];
-    s.loadImages(i); 
+	s.loadImages(i);
+}
+window.onload= function() {
+
+
+	bg.src='images/bg.jpg';
+	bg.onload=do_slide();
+
 }

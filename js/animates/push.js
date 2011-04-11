@@ -59,6 +59,7 @@ Abe.PushAnimate.prototype = {
 		if(this._start>this._stop){
     		this._start=this._stop;
     	}
+    	
     	this._drawImage(sender.maskContext,sender.preImage,sender.strength);
     	this._drawImage(sender.midContext,sender.curImage,sender.strength);
 	    switch(this._dir){
@@ -87,6 +88,7 @@ Abe.PushAnimate.prototype = {
 	    		this._bottomRight(sender);
 	    		break;
 	    }
+	    
 	    this._start+=this._step;
     	if(this._start===this._stop){
     		this._hasNextFrame=false;
