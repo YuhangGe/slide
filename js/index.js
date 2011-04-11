@@ -8,9 +8,9 @@ window.onload=function(){
 	var s_height=400;
 	
     canvas = $.$('canvas');
-    canvas.width=500;
+    canvas.width=300;
     canvas.height=400;
-    s= new Abe.Slide(canvas,null,null);//(, s_width,s_height,true);
+    s= new Abe.Slide(canvas,null,null,true);//(, s_width,s_height,true);
 	//s.addSlideAnimate('TestAnimate');
 	
 	var i=[ {title: 'Chrysanthemum',
