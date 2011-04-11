@@ -24,6 +24,7 @@ Abe.ClockAnimate.prototype = {
     },
     startAnimate: function(){
        	this._angle=this._step;
+       	this._anti_clock=false;//(Math.floor(Math.random()*2)==0)?true:false;
         this.callBase('startAnimate');
     },
     /**
@@ -48,10 +49,19 @@ Abe.ClockAnimate.prototype = {
         this._drawImage(sender.midContext,sender.curImage,sender.strength);
        	sender.midContext.globalCompositeOperation='destination-in'
  		
- 
+ 		
+ 		var from,to;
+ 		if(this._anti_clock===true){
+ 			from=this._start;
+ 			to=this._start+(this._angle/360*this._pi2);
+ 		}else{
+ 			from=this._start-this._angle/360*this._pi2;
+ 			to=this._start;
+ 		}
+ 		
         sender.midContext.beginPath()
         sender.midContext.moveTo(this._cx,this._cy);
-        sender.midContext.arc(this._cx,this._cy,this._cr  ,this._start,this._start+(this._angle/360*this._pi2), false);
+        sender.midContext.arc(this._cx,this._cy,this._cr ,from,to , false);
         sender.midContext.closePath();
         sender.midContext.fill();
 
