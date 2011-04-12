@@ -11,7 +11,9 @@ function do_slide(){
 	//s= new Abe.Slide(canvas);
 	s= new Abe.Slide(canvas,
 		{
-			'bgImage':bg
+			'width':300,
+			'height':400,
+			'strength':true
 		});
 	//s.addSlideAnimate('TestAnimate');
 
