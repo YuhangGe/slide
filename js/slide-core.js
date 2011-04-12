@@ -99,8 +99,8 @@ Abe.Slide.prototype = {
 	},
 	//增加默认的幻灯片切换特效,现在只有两种，期待你增加更多
 	_addDefaultSlides: function() {
-		this.addSlideAnimate(['PushAnimate','FadeAnimate','CircleAnimate','ClockAnimate']);
-		this.addSlideAnimate(['FlashAnimate']);
+		//this.addSlideAnimate(['PushAnimate','FadeAnimate','CircleAnimate','ClockAnimate']);
+		this.addSlideAnimate(['PushAnimate']);
 	},
 	/**
  	* @param [string | Array] slide_name
@@ -253,6 +253,7 @@ Abe.SlideAnimate = function(width, height) {
 	this._width = width;
 	this._height = height;
 	this._hasNextFrame = true;
+	this._speed=80;
 }
 Abe.SlideAnimate.prototype = {
 	/**
@@ -260,7 +261,7 @@ Abe.SlideAnimate.prototype = {
 	 * 前先调用自身的_fillBackground函数
 	 */
 	fillBackground:function(){
-		return true;
+		return this._speed;
 	},
 	/**
  	* 返回每一帧动画的间隔时间

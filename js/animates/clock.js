@@ -9,6 +9,7 @@ if(typeof Abe==="undefined") {
 
 Abe.ClockAnimate = function(width, height) {
 	this.base(width, height)
+	this._speed=20;
 	this._angle=0;
 	this._start=Math.PI*1.5;
 	this._step=6;
@@ -18,9 +19,6 @@ Abe.ClockAnimate = function(width, height) {
 	this._cr=Math.sqrt(this._cx*this._cx+this._cy*this._cy);
 }
 Abe.ClockAnimate.prototype = {
-	getSlideSpeed: function() {
-		return 20;
-	},
 	startAnimate: function() {
 		this._angle=this._step;
 		this._anti_clock=(Math.floor(Math.random()*2)==0)?true:false;//是否逆时针旋转
@@ -42,6 +40,7 @@ Abe.ClockAnimate.prototype = {
 	renderNextFrame: function(sender) {
 		if(this._hasNextFrame===false)
 			return;
+		this._angle+=this._step;
 		if(this._angle>360)
 			this._angle=360;
 			
@@ -68,7 +67,7 @@ Abe.ClockAnimate.prototype = {
 
 		sender.context.drawImage(sender.midCanvas,0,0);
 
-		this._angle+=this._step;
+	
 		if(this._angle===360) {
 			this._hasNextFrame=false;
 		}

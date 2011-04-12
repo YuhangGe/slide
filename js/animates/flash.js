@@ -9,11 +9,10 @@ Abe.FlashAnimate=function(width,height){
 	this._start=0;
 	this._length=0;
 	this._step=2;
+	
+	this._speed=5;
 }
 Abe.FlashAnimate.prototype={
-	getSlideSpeed:function(){
-		return 5;
-	},
     startAnimate: function(){
         this._length=1.5;
         this._start=0;
