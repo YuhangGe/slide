@@ -14,6 +14,8 @@ Abe.GradientAnimate= function(width,height) {
 	this._tan=this._height/this._width;
 	this._cos=this._width/this._cross;
 	this._sin=this._height/this._cross;
+
+
 	this._tail=20;
 }
 Abe.GradientAnimate.prototype={
@@ -48,8 +50,11 @@ Abe.GradientAnimate.prototype={
 
 		this._start+=this._step;
 
-		this._drawImage(sender.midContext,sender.preImage,sender.strength);
-		this._drawImage(sender.context,sender.curImage,sender.strength);
+	
+			this._drawImage(sender.midContext,sender.preImage,sender.strength);
+			this._drawImage(sender.context,sender.curImage,sender.strength);
+	
+
 		switch(this._dir) {
 			case 0:
 				this._left(sender);
@@ -75,6 +80,7 @@ Abe.GradientAnimate.prototype={
 			case 7:
 				this._bottomRight(sender);
 				break;
+		
 		}
 		sender.midContext.globalCompositeOperation='destination-in';
 		sender.midContext.drawImage(sender.maskCanvas,0,0);
@@ -85,35 +91,35 @@ Abe.GradientAnimate.prototype={
 	},
 	_left: function(sender) {
 		this._fillRect(sender.maskContext,
-				[0,0,this._width-this._start,this._height],1);
+		[0,0,this._width-this._start,this._height],1);
 		for(var i=1;i<=this._tail;i++) {
 			this._fillRect(sender.maskContext,
-				[this._width-this._start+i-1,0,1,this._height],1-i/this._tail);
+			[this._width-this._start+i-1,0,1,this._height],1-i/this._tail);
 		}
 	},
 	_right: function(sender) {
 		this._fillRect(sender.maskContext,
-				[this._start,0,this._width-this._start,this._height],1);
+		[this._start,0,this._width-this._start,this._height],1);
 		for(var i=1;i<=this._tail;i++) {
 			this._fillRect(sender.maskContext,
-				[this._start-i-1,0,1,this._height],1-i/this._tail);
+			[this._start-i-1,0,1,this._height],1-i/this._tail);
 		}
 
 	},
 	_top: function(sender) {
 		this._fillRect(sender.maskContext,
-				[0,this._start,this._width,this._height-this._start],1);
+		[0,this._start,this._width,this._height-this._start],1);
 		for(var i=1;i<=this._tail;i++) {
 			this._fillRect(sender.maskContext,
-				[0,this._start-i-1,this._width,1],1-i/this._tail);
+			[0,this._start-i-1,this._width,1],1-i/this._tail);
 		}
 	},
 	_bottom: function(sender) {
 		this._fillRect(sender.maskContext,
-			[0,0,this._width,this._height-this._start],1);
+		[0,0,this._width,this._height-this._start],1);
 		for(var i=1;i<=this._tail;i++) {
 			this._fillRect(sender.maskContext,
-				[0,this._height-this._start+i-1,this._width,1],1-i/this._tail);
+			[0,this._height-this._start+i-1,this._width,1],1-i/this._tail);
 		}
 	},
 	_topLeft: function(sender) {
@@ -210,7 +216,7 @@ Abe.GradientAnimate.prototype={
 			);
 		}
 	},
-	_fillRect:function(ctx,points,alpha){
+	_fillRect: function(ctx,points,alpha) {
 		ctx.globalAlpha=alpha;
 		ctx.fillRect(points[0],points[1],points[2],points[3]);
 	},
