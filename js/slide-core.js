@@ -99,8 +99,8 @@ Abe.Slide.prototype = {
 	},
 	//增加默认的幻灯片切换特效,现在只有两种，期待你增加更多
 	_addDefaultSlides: function() {
-		//this.addSlideAnimate(['PushAnimate','FadeAnimate','CircleAnimate','ClockAnimate','GradientAnimate','WaterAnimate']);
-		this.addSlideAnimate(['WaterAnimate']);
+		this.addSlideAnimate(['PushAnimate','FadeAnimate','CircleAnimate','ClockAnimate','GradientAnimate','WaterAnimate']);
+		//this.addSlideAnimate(['WaterAnimate']);
 	},
 	/**
  	* @param [string | Array] slide_name
