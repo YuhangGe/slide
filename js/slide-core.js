@@ -261,13 +261,13 @@ Abe.SlideAnimate.prototype = {
 	 * 前先调用自身的_fillBackground函数
 	 */
 	fillBackground:function(){
-		return this._speed;
+		return true;
 	},
 	/**
  	* 返回每一帧动画的间隔时间
  	*/
 	getSlideSpeed: function() {
-		return 80;
+		return this._speed;
 	},
 	/**
  	* 初始化，开始动画
