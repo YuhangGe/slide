@@ -2,14 +2,9 @@ var canvas = null;
 var s=null;
 var bg=new Image();
 function do_slide(){
-	
-	var s_width=350;
-	var s_height=500;
-	canvas = $.$('canvas');
-	canvas.width=600;
-	canvas.height=500;
+
 	//s= new Abe.Slide(canvas);
-	s= new Abe.Slide(canvas,
+	s= new Abe.Slide('slide_context',
 		{
 			width:300,
 			height:400,
@@ -56,6 +51,7 @@ function do_slide(){
 		$.dprint('image loaded finished!');
 		$('#testBtn').attr('disabled',false);
 	});
+	
 }
 
 function slideTo(){

@@ -23,12 +23,17 @@ var Abe = {};//定义命名空间，所有动画插件的声明都需要在此�
  * 	openNew:{boolean},是否在新窗口中打开网页，默认为true;
  * }
  * */
-Abe.Slide = function(canvas,params) {
-	if (typeof canvas === 'string')
-		this._canvas = document.getElementById(canvas);
-	else
-		this._canvas = canvas;
+Abe.Slide = function(parent,params) {
 
+	if (typeof parent === 'string')
+		this._parent = jQuery('#'+parent);
+	else
+		this._parent = jQuery(parent);
+	if(this._parent.length===0)
+		throw 'could not found parent!';
+
+	if(this._parent.css('position')==='static')
+		this._parent.css('position','relative');//设置为relative，因为子元素使用绝对定位
 	//进行初始化
 	this._init();
 
@@ -42,7 +47,7 @@ Abe.Slide = function(canvas,params) {
 		if(typeof params['width']==='number' && typeof params['height']==='number')
 			this.setSize(params['width'],params['height']);
 		else
-			this.setSize(this._canvas.width,this._canvas.height);
+			this.setSize(this._parent.width(),this._parent.height());
 
 		if(typeof params['bgColor']==='string')
 			this._bgColor=params['bgColor'];
@@ -77,7 +82,7 @@ Abe.Slide = function(canvas,params) {
 		// 		};
 		// 		if(typeof params['title']!=='undefined') {
 		// 			var top=params['title'];
-		// 
+		//
 		// 			if(typeof top['show']==='boolean')
 		// 				this._showTitle=top['show'];
 		// 			if(typeof top['bgHeight']==='number')
@@ -113,8 +118,13 @@ Abe.Slide = function(canvas,params) {
 }
 Abe.Slide.prototype = {
 	_init: function() {
+		this._canvas=document.createElement('canvas');
+		this._ctrl_canvas=document.createElement('canvas');
+		//$.dprint($(this._canvas));
+		jQuery(this._canvas).css({position:'absolute',top:'0px',left:'0px',border:'1px solid blue;',background:'black'}).appendTo(this._parent);
+		jQuery(this._ctrl_canvas).css({position:'absolute',bottom:'0px',left:'0px',background:'blue',opacity:'0.5'}).appendTo(this._parent);
 
-		this._context = canvas.getContext('2d');
+		this._context = this._canvas.getContext('2d');
 		this._width=0;
 		this._height=0;
 		this._bgColor=null;
@@ -160,10 +170,15 @@ Abe.Slide.prototype = {
 		}
 	},
 	setSize: function(width, height) {
+		$.dprint(width+","+height);
 		this._width=width;
 		this._height=height;
+		this._parent.width(width);
+		this._parent.height(height);
 		this._canvas.width = width;
 		this._canvas.height = height;
+		this._ctrl_canvas.width=width;
+		this._ctrl_canvas.height=30;
 		this._midCanvas.width = width;
 		this._midCanvas.height = height;
 		this._maskCanvas.width = width;
