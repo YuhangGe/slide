@@ -29,7 +29,7 @@
 		background: black;
 		border: 1px solid blue;
 	}
-	#control{
+	#control {
 		background: black;
 		opacity: 0.5;
 		position: absolute;
@@ -38,27 +38,44 @@
 		width:300px;
 		height:30px;
 	}
+	#slide_context {
+		position:relative;
+		width:300px;
+		height:400px;
+		border:1px solid red;
+		display:inline-block;
+	}
 		</style>
 	</head>
 	<body>
 		<h2>HTML5首页幻灯片播放器</h2>
 		<p>
-			目前实现了框架的搭建和7动切换动画。框架采用的插件的思想，可以动态增加更多的动画，目前还在开发中。<br/>同时，下一步还会完善细节，诸如单击图片打开对应网页，显示标题等。
+			目前实现了框架的搭建和7动切换动画。框架采用的插件的思想，可以动态增加更多的动画，目前还在开发中。
+			<br/>
+			同时，下一步还会完善细节，诸如单击图片打开对应网页，显示标题等。
 		</p>
-		<p>资金有限，空间速度不快，第一次加载图片很慢，请耐心等待。你可以去看看新闻或八卦再过来~~~~
-		
-		<div style='text-align:center;'>
-			<div id="slide_context" >
-				
+		<p>
+			资金有限，空间速度不快，第一次加载图片很慢，请耐心等待。你可以去看看新闻或八卦再过来~~~~
+
+			<div style='text-align:center;'>
+
+				<div id="slide_context" >
+				</div>
+				<div>
+				<input id='testBtn' type='button' value='Test' onclick="slideTo();" disabled="true">
+				</div>
 			</div>
-			<input id='testBtn' type='button' value='Test' onclick="slideTo();" disabled="true"></div>
-		</div>
-		<div style='text-align:center;'>
-			<p>
-			本项目由<a href='mailto:abraham1@163.com'>Abraham</a>开发，单击此处访问<a href='https://github.com/YuhangGe/slide' target='_blank'>项目Git开源主页</a>
-			</p>
-			<p>
-				欢迎访问我的个人空间<a href='http://www.yuhanghome.net' target='_blank'>羽航的小屋</a>和我的新浪微博<a href='http://weibo.com/abeyuhang' target='_blank'>AbeYuhang</a>
-			</p>
+			</div>
+			<div style='text-align:center;'>
+				<p>
+					本项目由
+					<a href='mailto:abraham1@163.com'>Abraham</a>开发，单击此处访问
+					<a href='https://github.com/YuhangGe/slide' target='_blank'>项目Git开源主页</a>
+				</p>
+				<p>
+					欢迎访问我的个人空间
+					<a href='http://www.yuhanghome.net' target='_blank'>羽航的小屋</a>和我的新浪微博
+					<a href='http://weibo.com/abeyuhang' target='_blank'>AbeYuhang</a>
+				</p>
 	</body>
 </html>

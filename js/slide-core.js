@@ -37,17 +37,16 @@ Abe.Slide = function(parent,params) {
 	//进行初始化
 	this._init();
 
+	
 	//解析参数
-	if(params) {
+	if(params ) {
 		if(typeof params['strength']==='boolean')
 			this._stren=params['strength'];
-		else
-			this._stren=false;
 
 		if(typeof params['width']==='number' && typeof params['height']==='number')
 			this.setSize(params['width'],params['height']);
-		else
-			this.setSize(this._parent.width(),this._parent.height());
+
+	
 
 		if(typeof params['bgColor']==='string')
 			this._bgColor=params['bgColor'];
@@ -135,13 +134,15 @@ Abe.Slide.prototype = {
 		this._maskCanvas = document.createElement('canvas');
 		this._maskContext = this._maskCanvas.getContext('2d');
 
+		this.setSize(this._parent.width(),this._parent.height());
+		
 		this._images = null;
 		this._loadedIndex = 0;
 		this._buffer = new Array();
 		this._curImgIndex = 0;
 
 		this._speed=3000;
-
+	    this._stren=true;
 		this._slideArray = new Array();
 		this._curSlideIndex = 0;
 
