@@ -102,7 +102,7 @@ Abe.GradientAnimate.prototype={
 		[this._start,0,this._width-this._start,this._height],1);
 		for(var i=1;i<=this._tail;i++) {
 			this._fillRect(sender.maskContext,
-			[this._start-i-1,0,1,this._height],1-i/this._tail);
+			[this._start-i,0,1,this._height],1-i/this._tail);
 		}
 
 	},
@@ -111,7 +111,7 @@ Abe.GradientAnimate.prototype={
 		[0,this._start,this._width,this._height-this._start],1);
 		for(var i=1;i<=this._tail;i++) {
 			this._fillRect(sender.maskContext,
-			[0,this._start-i-1,this._width,1],1-i/this._tail);
+			[0,this._start-i,this._width,1],1-i/this._tail);
 		}
 	},
 	_bottom: function(sender) {

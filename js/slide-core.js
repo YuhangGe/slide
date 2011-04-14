@@ -4,7 +4,7 @@
  * @email: abraham1@163.com
  * 依赖jquery.js、js-oo.js文件
  */
- 
+
 var Abe = {};//定义命名空间，所有动画插件的声明都需要在此命名空间之下
 /**
  *
@@ -56,15 +56,45 @@ Abe.Slide = function(canvas,params) {
 
 		if(typeof params['autoSlide']==='boolean')
 			this._autoSlide=params['autoSlide'];
-		
+
 		if(typeof params['cursor']==='string')
 			this._canvas.style.cursor=params['cursor'];
-			
+
 		if(typeof params['openUrl']==='boolean')
 			this._openUrl=params['openUrl'];
-		
+
 		if(typeof params['openNew']==='boolean')
 			this._openNew=params['openNew'];
+
+		// var to={
+		// 			show:true,
+		// 			bgColor:'black',
+		// 			color:'blue',
+		// 			alpha:1,
+		// 			font:'20px 婼',
+		// 			bgHeight:30,
+		// 			bgAlpha:0.7
+		// 		};
+		// 		if(typeof params['title']!=='undefined') {
+		// 			var top=params['title'];
+		// 
+		// 			if(typeof top['show']==='boolean')
+		// 				this._showTitle=top['show'];
+		// 			if(typeof top['bgHeight']==='number')
+		// 				to['bgHeight']=top['bgHeight'];
+		// 			if(typeof top['font']!=='undefined')
+		// 				to['font']=top['font'];
+		// 			if(typeof top['bgColor']!=='undefined')
+		// 				to['bgColor']=top['bgColor'];
+		// 			if(typeof top['color']!=='undefined')
+		// 				to['color']=top['color'];
+		// 			if(typeof top['alpha']==='number')
+		// 				to['alpha']=top['alpha'];
+		// 			if(typeof top['bgAlpha']==='number')
+		// 				to['bgAlpha']=top['bgAlpha'];
+		// 		}
+		// 		this._titleOptions=to;
+
 	}
 
 	//构造传递给animate组件的参数
@@ -114,15 +144,15 @@ Abe.Slide.prototype = {
 
 		this._imgLoaded=false;
 		this._imgOnLoaded=null;
-		
+		this._showTitle=true;
 		this._canvas.style.cursor="pointer";//设置鼠标指针为手形
 		this._openUrl=true;//单击后是否打开网页
 		this._openNew=true;//是否在新窗口中打开
 		jQuery(this._canvas).bind('click',jQuery.proxy(this._doOpenUrl,this));
 	},
-	_doOpenUrl:function(){
+	_doOpenUrl: function() {
 		var url=this._images[this._curImgIndex].url;
-		if(url){
+		if(url) {
 			if(this._openNew)
 				window.open(url);
 			else
@@ -142,7 +172,7 @@ Abe.Slide.prototype = {
 	//增加默认的幻灯片切换特效,现在只有两种，期待你增加更多
 	_addDefaultSlides: function() {
 		this.addSlideAnimate(['PushAnimate','FadeAnimate','CircleAnimate','ClockAnimate','GradientAnimate','WaterAnimate']);
-		//this.addSlideAnimate(['WaterAnimate']);
+		//this.addSlideAnimate(['GradientAnimate']);
 	},
 	/**
  	* @param [string | Array] slide_name
@@ -269,7 +299,9 @@ Abe.Slide.prototype = {
 
 			var img=this._buffer[this._curImgIndex];
 			this._drawImage(img);
-
+			// if(this._showTitle) {
+			// 	this._drawTitle(this._context,this._images[this._curImgIndex].title);
+			// }
 			this._doSliding=false;
 			if(this._autoSlide===true)
 				this._slideTimeOut=setTimeout(jQuery.proxy(this._switchNext,this), this._speed);
@@ -277,6 +309,17 @@ Abe.Slide.prototype = {
 		}
 
 	},
+	// _drawTitle: function(ctx,text) {
+	// 	ctx.font=this._titleOptions.font;
+	// 	ctx.fillStyle=this._titleOptions.bgColor;
+	// 	ctx.globalAlpha=this._titleOptions.bgAlpha;
+	// 	ctx.fillRect(0,0,this._width,this._titleOptions.bgHeight);
+	// 	ctx.fillStyle=this._titleOptions.color;
+	// 	ctx.globalAlpha=this._titleOptions.alpha;
+	// 	var w=ctx.measureText(text).width;
+	// 	//ctx.textAlign='center';
+	// 	ctx.fillText(text,(this._width-w)/2,this._titleOptions.bgHeight/2,this._width);
+	// },
 	_refreshContext: function() {
 		this._canvas.width = this._canvas.width;
 		this._midCanvas.width = this._midCanvas.width;
