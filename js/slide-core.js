@@ -4,20 +4,25 @@
  * @email: abraham1@163.com
  * 依赖jquery.js、js-oo.js文件
  */
-var Abe = {};
+ 
+var Abe = {};//定义命名空间，所有动画插件的声明都需要在此命名空间之下
 /**
  *
  * @param {Object} canvas
  * @param {Json Object} params 可选，配置json，包括如下选项:
  * {
  * 	width:{Number}, 画布宽度,可忽略,如果忽略，在调用loadImages前可以调用setSize设置，否则将使用canvas的默认宽高作为画面的宽高.
- * 	height:{Number}, 画面高度,可忽略,同上.
- *  strength: {Boolean}, 是否根据width和height强致伸缩图片，如果为false，会把图片绘制在canvas中间
+ * 	height:{Number}, 画面高度,可忽略,同上.width和height必须同时指定
+ *  strength: {Boolean}, 是否根据width和height强致伸缩图片，如果为false，会把图片绘制在canvas中间,默认为true
  *	bgColor:{String},背景颜色字符串，如果忽略，则不填充背景
  * 	bgImage:{Image},背景图片，强制拉升填充，如果不设置则不填充。如果同时设置bgColor和bgImage，忽略bgImage
+ * 	speed:{number},每张图片切换后的停留时间，默认为3000毫秒，即3秒
+ * 	autoSlide:{boolean},调用loadImages函数加载图片完成后是否自动开始动画，默认为true.如果为false，可以通过loadImages的onloaded回调函数参数，以及slideNext方法手动控制播放
+ * 	cursor:{string},鼠标指针样式，默认为pointer,即手形
+ * 	openUrl:{boolean},单击后是否打开网页，默认为true，要求loadImages传入的参数有url.
+ * 	openNew:{boolean},是否在新窗口中打开网页，默认为true;
  * }
  * */
-
 Abe.Slide = function(canvas,params) {
 	if (typeof canvas === 'string')
 		this._canvas = document.getElementById(canvas);
@@ -33,17 +38,35 @@ Abe.Slide = function(canvas,params) {
 			this._stren=params['strength'];
 		else
 			this._stren=false;
-		if(typeof params['width']==='number' && typeof params['height']==='number') {
+
+		if(typeof params['width']==='number' && typeof params['height']==='number')
 			this.setSize(params['width'],params['height']);
-		} else {
+		else
 			this.setSize(this._canvas.width,this._canvas.height);
-		}
+
 		if(typeof params['bgColor']==='string')
 			this._bgColor=params['bgColor'];
+
 		if(typeof params['bgImage']!=='undefined')
 			this._bgImage=params['bgImage'];
+
+		if(typeof params['speed']==='number')
+			if(params['speed']>0)
+				this._speed=params['speed'];
+
+		if(typeof params['autoSlide']==='boolean')
+			this._autoSlide=params['autoSlide'];
+		
+		if(typeof params['cursor']==='string')
+			this._canvas.style.cursor=params['cursor'];
+			
+		if(typeof params['openUrl']==='boolean')
+			this._openUrl=params['openUrl'];
+		
+		if(typeof params['openNew']==='boolean')
+			this._openNew=params['openNew'];
 	}
-	
+
 	//构造传递给animate组件的参数
 	this._sender = {
 		background:(this._bgColor===null?this._bgImage:this._bgColor),
@@ -60,6 +83,7 @@ Abe.Slide = function(canvas,params) {
 }
 Abe.Slide.prototype = {
 	_init: function() {
+
 		this._context = canvas.getContext('2d');
 		this._width=0;
 		this._height=0;
@@ -70,26 +94,44 @@ Abe.Slide.prototype = {
 
 		this._maskCanvas = document.createElement('canvas');
 		this._maskContext = this._maskCanvas.getContext('2d');
-		this._maskContext.fillStyle = 'rgb(0,0,0)';
 
-		this._speed = 3000;//间隔时间, 毫秒
 		this._images = null;
 		this._loadedIndex = 0;
 		this._buffer = new Array();
 		this._curImgIndex = 0;
 
+		this._speed=3000;
+
 		this._slideArray = new Array();
 		this._curSlideIndex = 0;
+
+		this._autoSlide=true;//是否自动切换
+		this._doSliding=false;//当前是否正在切换，如果是，不允许调用slideNext方法手动切换
+
+		//当前正在等待的切换，如果当前是在自动切换的模式（this._autoSlide=true)，
+		//而用户又调用了手动切换的方法slideNext，那么需要先清除这个等待的切换
+		this._slideTimeOut=null;
+
+		this._imgLoaded=false;
+		this._imgOnLoaded=null;
+		
+		this._canvas.style.cursor="pointer";//设置鼠标指针为手形
+		this._openUrl=true;//单击后是否打开网页
+		this._openNew=true;//是否在新窗口中打开
+		jQuery(this._canvas).bind('click',jQuery.proxy(this._doOpenUrl,this));
 	},
-	setSpeed: function(speed) {
-		if (speed instanceof Number && speed > 0) {
-			this._speed = speed;
+	_doOpenUrl:function(){
+		var url=this._images[this._curImgIndex].url;
+		if(url){
+			if(this._openNew)
+				window.open(url);
+			else
+				window.location.href=url;
 		}
 	},
 	setSize: function(width, height) {
 		this._width=width;
 		this._height=height;
-		//debug.print('size: '+width+','+height);
 		this._canvas.width = width;
 		this._canvas.height = height;
 		this._midCanvas.width = width;
@@ -127,15 +169,43 @@ Abe.Slide.prototype = {
  	* {
  	* title:'南京大学',
  	* src:'nju.bmp',
- 	* direct:'www.nju.edu.cn'
+ 	* url:'www.nju.edu.cn'
  	* }
+ 	* @param {function} onloaded 当图片加载完成后的回调函数
  	*/
-	loadImages: function(imgInfo) {
+	loadImages: function(imgInfo,onloaded) {
 		if (!imgInfo instanceof Array) {
 			throw 'Bad arguments when loadImages';
 		}
+		if(this._imgLoaded===true) {
+			throw 'Already loaded images.\nThis function can only be called once.';
+		}
 		this._images = imgInfo;
+		if(typeof onloaded==='function')
+			this._imgOnLoaded=onloaded;
+
 		this._loadNext();
+	},
+	/**
+ 	* 手动切换图片
+ 	* @param {number} index 可选参数，切换到的图片的索引值，如果忽略，切换到下一张
+ 	*/
+	slideNext: function(index) {
+		if(this._doSliding===true) {//如果当前正在执行切换动画，忽略
+			//$.dprint('current is sliding , could not operate manual slide');
+			return;
+		}
+
+		//否则手动切换
+		clearTimeout(this._slideTimeOut);
+		//$.dprint('slide to '+index);
+		var len = this._buffer.length;
+		//如果没有传入index参数或都参数不合法，切换到下一张
+		if(typeof index!=='number' || index>=len || index===this._curImgIndex)
+			this._switchNext();
+		else
+			this._switchImage(index);
+
 	},
 	_loadFirstImage: function() {
 
@@ -146,7 +216,7 @@ Abe.Slide.prototype = {
 		this._drawImage(this._buffer[0]);
 
 	},
-	_fillBackground:function(){
+	_fillBackground: function() {
 		if(this._bgColor!=null) {
 			this._context.fillStyle=this._bgColor;
 			this._context.fillRect(0,0,this._width,this._height);
@@ -194,12 +264,16 @@ Abe.Slide.prototype = {
 			//然后调用动画插件绘制下一帧
 			cslide.renderNextFrame(this._sender);
 
-			setTimeout($.proxy(this._drawNext,this), cslide.getSlideSpeed());
+			setTimeout(jQuery.proxy(this._drawNext,this), cslide.getSlideSpeed());
 		} else {
 
 			var img=this._buffer[this._curImgIndex];
 			this._drawImage(img);
-			setTimeout($.proxy(this._switchImage,this), this._speed);
+
+			this._doSliding=false;
+			if(this._autoSlide===true)
+				this._slideTimeOut=setTimeout(jQuery.proxy(this._switchNext,this), this._speed);
+
 		}
 
 	},
@@ -208,25 +282,31 @@ Abe.Slide.prototype = {
 		this._midCanvas.width = this._midCanvas.width;
 		this._maskCanvas.width = this._maskCanvas.width;
 	},
-	_switchImage: function() {
+	_switchNext: function() {
 		var len = this._buffer.length;
-
+		var index=this._curImgIndex;
+		index++;
+		if(index>=len)
+			index=0;
+		this._switchImage(index);
+	},
+	_switchImage: function(index) {
 		this._sender.preImage = this._buffer[this._curImgIndex];
-
-		this._curImgIndex++;
-		if (this._curImgIndex >= len)
-			this._curImgIndex = 0;
+		this._curImgIndex=index;
 		this._sender.curImage = this._buffer[this._curImgIndex];
 
-		len = this._slideArray.length;
-
-		this._curSlideIndex=Math.floor(Math.random()*len);
+		this._curSlideIndex=Math.floor(Math.random()*this._slideArray.length);
+		this._doSliding=true;
 		this._slideArray[this._curSlideIndex].startAnimate();
 		this._drawNext();
 	},
 	_loadImageFinish: function() {
 		//$.dprint('limgf');
-		this._switchImage();
+		this._imgLoaded=true;
+		if(this._imgOnLoaded!==null)
+			this._imgOnLoaded();
+		if(this._autoSlide===true)
+			this._switchNext();
 	},
 	_loadNext: function() {
 		var len = this._images.length;
@@ -239,7 +319,7 @@ Abe.Slide.prototype = {
 			this._loadedIndex++;
 			this._buffer.push(img);
 			img.src = info.src.toString();
-			img.onload = $.proxy(this._loadNext,this);
+			img.onload = jQuery.proxy(this._loadNext,this);
 		} else {
 			this._loadImageFinish();
 		}
@@ -257,10 +337,10 @@ Abe.SlideAnimate = function(width, height) {
 }
 Abe.SlideAnimate.prototype = {
 	/**
-	 * 在渲染每一帧前是否填充背景，默认返回true，Slide类通过这个函数控制是否在调用动画插件的renderNextFrame
-	 * 前先调用自身的_fillBackground函数
-	 */
-	fillBackground:function(){
+ 	* 在渲染每一帧前是否填充背景，默认返回true，Slide类通过这个函数控制是否在调用动画插件的renderNextFrame
+ 	* 前先调用自身的_fillBackground函数
+ 	*/
+	fillBackground: function() {
 		return true;
 	},
 	/**
@@ -286,25 +366,27 @@ Abe.SlideAnimate.prototype = {
  	*
  	* @param {Object} sender
  	* {
+ 	* 	background:,
  	* 	context:,
  	* 	midContext:,
  	* 	midCanvas:,
  	* 	maskContext:,
- 	*  preImage:,
- 	*  curImage:,
- 	*  strength:Boolean
+ 	* 	maskCanvas
+ 	*  	preImage:,
+ 	*  	curImage:,
+ 	*  	strength:Boolean
  	* }
  	*/
 	renderNextFrame: function(sender) {
 		throw "This method must be overrided!";
 	},
-	_fill:function(ctx,bg){
+	_fill: function(ctx,bg) {
 		if(bg===null)
 			return;
-		if(typeof bg === 'string'){
+		if(typeof bg === 'string') {
 			ctx.fillStyle=bg;
 			ctx.fillRect(0,0,this._width,this._height);
-		}else{
+		} else {
 			ctx.drawImage(bg,0,0,this._width,this._height);
 		}
 	},

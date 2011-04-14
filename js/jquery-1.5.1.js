@@ -751,9 +751,6 @@ jQuery.extend({
 	guid: 1,
 
 	proxy: function( fn, proxy, thisObject ) {
-		return function(){
-			fn.apply(proxy,arguments);
-		};
 		if ( arguments.length === 2 ) {
 			if ( typeof proxy === "string" ) {
 				thisObject = fn;
@@ -8318,9 +8315,9 @@ jQuery.each([ "Height", "Width" ], function( i, name ) {
 window.jQuery = window.$ = jQuery;
 })(window);
 
-//¸øjQueryÌí¼Ó¼¸¸ö³£ÓÃ·½·¨¡£
+//ï¿½ï¿½jQueryï¿½ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½
 jQuery.extend({
-		/*Ö±½Ó»ñÈ¡element*/
+		/*Ö±ï¿½Ó»ï¿½È¡element*/
 		$:function(id){
 			return document.getElementById(id);
 		},

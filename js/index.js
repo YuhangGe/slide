@@ -11,9 +11,11 @@ function do_slide(){
 	//s= new Abe.Slide(canvas);
 	s= new Abe.Slide(canvas,
 		{
-			'width':300,
-			'height':400,
-			'strength':true
+			width:300,
+			height:400,
+			strength:true,
+			autoSlide:true,
+			openNew:false
 		});
 	//s.addSlideAnimate('TestAnimate');
 
@@ -29,7 +31,7 @@ function do_slide(){
 		src: 'images/3.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
-		title: 'Penguins',
+		title: '我的美眉',
 		src: 'images/4.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
@@ -37,7 +39,7 @@ function do_slide(){
 		src: 'images/6.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
-		title: 'Koala',
+		title: 'Lovely',
 		src: 'images/7.jpg',
 		url: 'http://www.nju.edu.cn'
 	},{
@@ -50,7 +52,14 @@ function do_slide(){
 		src: 'images/10.jpg',
 		url: 'http://www.nju.edu.cn'
 	}];
-	s.loadImages(i);
+	s.loadImages(i,function(){
+		$.dprint('image loaded finished!');
+		$('#testBtn').attr('disabled',false);
+	});
+}
+
+function slideTo(){
+	s.slideNext(6);
 }
 window.onload= function() {
 
