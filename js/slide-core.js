@@ -649,4 +649,9 @@ Abe.SlideAnimate.prototype = {
 				w=this._width;
 				h=tmp_h;
 			}
-			ctx.drawImage(image,
+			 ctx.drawImage(image,x,y,w,h);
+   }
+
+ }
+
+}
