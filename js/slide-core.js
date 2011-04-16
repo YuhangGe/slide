@@ -37,7 +37,6 @@ Abe.Slide = function(parent,params) {
 	//进行初始化
 	this._init();
 
-	
 	//解析参数
 	if(params ) {
 		if(typeof params['strength']==='boolean')
@@ -45,8 +44,6 @@ Abe.Slide = function(parent,params) {
 
 		if(typeof params['width']==='number' && typeof params['height']==='number')
 			this.setSize(params['width'],params['height']);
-
-	
 
 		if(typeof params['bgColor']==='string')
 			this._bgColor=params['bgColor'];
@@ -101,6 +98,8 @@ Abe.Slide = function(parent,params) {
 
 	}
 
+	this._ctrl=new Abe.SlideControl(this._ctrl_canvas,'#000000');
+
 	//构造传递给animate组件的参数
 	this._sender = {
 		background:(this._bgColor===null?this._bgImage:this._bgColor),
@@ -121,9 +120,11 @@ Abe.Slide.prototype = {
 		this._ctrl_canvas=document.createElement('canvas');
 		//$.dprint($(this._canvas));
 		jQuery(this._canvas).css({position:'absolute',top:'0px',left:'0px',border:'1px solid blue;',background:'black'}).appendTo(this._parent);
-		jQuery(this._ctrl_canvas).css({position:'absolute',bottom:'0px',left:'0px',background:'blue',opacity:'0.5'}).appendTo(this._parent);
+		jQuery(this._ctrl_canvas).css({position:'absolute',bottom:'0px',left:'0px'}).appendTo(this._parent);
 
 		this._context = this._canvas.getContext('2d');
+		this._ctrl_ctx=this._ctrl_canvas.getContext('2d');
+		this._ctrlHeight=30;
 		this._width=0;
 		this._height=0;
 		this._bgColor=null;
@@ -135,14 +136,14 @@ Abe.Slide.prototype = {
 		this._maskContext = this._maskCanvas.getContext('2d');
 
 		this.setSize(this._parent.width(),this._parent.height());
-		
+
 		this._images = null;
 		this._loadedIndex = 0;
 		this._buffer = new Array();
 		this._curImgIndex = 0;
 
 		this._speed=3000;
-	    this._stren=true;
+		this._stren=true;
 		this._slideArray = new Array();
 		this._curSlideIndex = 0;
 
@@ -179,7 +180,7 @@ Abe.Slide.prototype = {
 		this._canvas.width = width;
 		this._canvas.height = height;
 		this._ctrl_canvas.width=width;
-		this._ctrl_canvas.height=30;
+		this._ctrl_canvas.height=this._ctrlHeight;
 		this._midCanvas.width = width;
 		this._midCanvas.height = height;
 		this._maskCanvas.width = width;
@@ -237,9 +238,10 @@ Abe.Slide.prototype = {
  	* @param {number} index 可选参数，切换到的图片的索引值，如果忽略，切换到下一张
  	*/
 	slideNext: function(index) {
+		$.dprint('try slide to '+index);
 		if(this._doSliding===true) {//如果当前正在执行切换动画，忽略
 			//$.dprint('current is sliding , could not operate manual slide');
-			return;
+			return false;
 		}
 
 		//否则手动切换
@@ -252,6 +254,7 @@ Abe.Slide.prototype = {
 		else
 			this._switchImage(index);
 
+		return true;
 	},
 	_loadFirstImage: function() {
 
@@ -260,6 +263,7 @@ Abe.Slide.prototype = {
 		this._addDefaultSlides();
 
 		this._drawImage(this._buffer[0]);
+		this._ctrl.setCurrent(0);
 
 	},
 	_fillBackground: function() {
@@ -358,9 +362,16 @@ Abe.Slide.prototype = {
 		this._doSliding=true;
 		this._slideArray[this._curSlideIndex].startAnimate();
 		this._drawNext();
+
+		this._ctrl.setCurrent(index);
 	},
 	_loadImageFinish: function() {
 		//$.dprint('limgf');
+		this._ctrl.setMax(this._images.length-1);
+		this._ctrl.addListener(jQuery.proxy( function(index) {
+			$.dprint(this);
+			return this.slideNext(index);
+		},this));
 		this._imgLoaded=true;
 		if(this._imgOnLoaded!==null)
 			this._imgOnLoaded();
@@ -385,6 +396,170 @@ Abe.Slide.prototype = {
 	}
 }
 
+Abe.SlideControl= function(canvas,background) {
+	this._canvas=canvas;
+	this._bg=background;
+	this._start=0;
+	this._end=0;
+	this._ctx=this._canvas.getContext('2d');
+	this._n=5;//显示5个索引
+	this._hn=Math.floor((this._n-1)/2);
+	this._btns=new Array();
+	this._cur=0;
+	this._mse_idx=-1;//当前鼠标移动到的索引，-1表示没有
+	this._mse_in=false;
+
+	this._init();
+	this._drawBackground();
+
+}
+Abe.SlideControl.prototype={
+	_Rect: function (left,top,width,height) {
+		this.Left=left;
+		this.Top=top;
+		this.Width=width;
+		this.Height=height;
+		this.Right=left+width;
+		this.Bottom=top+height;
+		this.isPointInRect= function(x,y) {
+			return (x>=this.Left && x<=this.Right)
+			&& (y>=this.Top && y<=this.Bottom);
+		}
+	},
+	_init: function() {
+		this._width=this._canvas.width;
+		this._height=this._canvas.height;
+		this._handler=null;
+		for(var i=0;i<this._n;i++) {
+			this._btns.push(
+			new this._Rect(
+			this._width-(i+1)*10-i*20-30,
+			(this._height-20)/2,
+			20,
+			20
+			)
+			);
+		}
+	},
+	_repaint: function() {
+		this._canvas.width=this._width;
+		this._drawBackground();
+		this._drawBtn();
+	},
+	_drawBackground: function() {
+		this._ctx.fillStyle=this._bg;
+		var start=this._width/10;
+		for(var i=start;i<this._width;i++) {
+			this._ctx.globalAlpha=(i-start)/this._width;
+			this._ctx.fillRect(i,0,1,this._height);
+		}
+		this._ctx.strokeStyle='#ff0000';
+		this._ctx.globalAlpha=1;
+		for(var i=0;i<this._n;i++) {
+			var b=this._btns[i];
+			this._ctx.strokeRect(b.Left,b.Top,b.Width,b.Height);
+		}
+	},
+	_drawBtn: function() {
+		this._ctx.fillStyle='#ffffff';
+
+		for(var i=0;i<this._n;i++) {
+			var b=this._btns[this._n-i-1];
+			var tmp=this._start+i;
+			if(tmp!==this._mse_idx ) {
+				this._ctx.font="20px sys";
+			} else {
+				this._ctx.font="bolder 20px sys ";
+			}
+			this._ctx.fillText(tmp+1,b.Left+5,b.Bottom-3);
+			if(tmp===this._cur) {
+				this._ctx.fillRect(b.Left+1,b.Bottom-1,b.Width-2,1);
+			}
+
+		}
+
+	},
+	setCurrent: function(index) {
+		if(index<0 || index> this._end)
+			return;
+		this._setIndex(index);
+	},
+	_setIndex: function(index) {
+
+		if(index<=this._hn) {
+
+			this._start=0;
+		} else if(index>=this._end-this._hn) {
+			this._start=this._end-this._n+1;
+		} else {
+			this._start=index-this._hn;
+		}
+		this._cur=index;
+		//$.dprint("cur:"+this._cur);
+		this._repaint();
+	},
+	_dealMouseMove: function(e) {
+		var x=e.layerX;
+		var y=e.layerY;
+		var index=-1;
+		for(var i=0;i<this._n;i++) {
+			var b=this._btns[i];
+			if(b.isPointInRect(x,y)===true) {
+				index=this._n-i-1;
+				break;
+			}
+		}
+		if(index!==-1) {
+			if(this._mse_in===false) {
+				//$.dprint(index);
+				this._canvas.style.cursor="pointer";
+				this._mse_idx=this._start+index;
+				this._repaint();
+				this._mse_in=true;
+
+			}
+
+		} else {
+			if(this._mse_in===true) {
+				this._canvas.style.cursor="default";
+				this._mse_idx=-1;
+				this._repaint();
+				this._mse_in=false;
+			}
+		}
+	},
+	_dealClick: function(e) {
+		if(this._handler===null)
+			return;
+		var index=-1;
+		for(var i=0;i<this._n;i++) {
+			if(this._btns[i].isPointInRect(e.layerX,e.layerY)===true) {
+				index=this._n-i-1;
+				break;
+			}
+		}
+		if(index!==-1) {
+			if(this._handler[this._start+index]===true){
+				this._setIndex(this._start+index);
+			}else{
+				$.dprint('sliding wroing!');
+			}
+				
+		}
+	},
+	setMax: function(max) {
+		this._end=max;
+		//$.dprint('max:'+max);
+		this._cur=0;
+		jQuery(this._canvas).bind('mousemove',jQuery.proxy(this._dealMouseMove,this));
+
+		jQuery(this._canvas).bind('click',jQuery.proxy(this._dealClick,this));
+	},
+	addListener: function(handler) {
+		if(typeof handler ==='function')
+			this._handler=handler;
+	}
+}
 /**
  * 幻灯片转换动画父类
  */
@@ -474,7 +649,4 @@ Abe.SlideAnimate.prototype = {
 				w=this._width;
 				h=tmp_h;
 			}
-			ctx.drawImage(image,x,y,w,h);
-		}
-	}
-}
+			ctx.drawImage(image,
