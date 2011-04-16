@@ -238,7 +238,7 @@ Abe.Slide.prototype = {
  	* @param {number} index 可选参数，切换到的图片的索引值，如果忽略，切换到下一张
  	*/
 	slideNext: function(index) {
-		$.dprint('try slide to '+index);
+		//$.dprint('try slide to '+index);
 		if(this._doSliding===true) {//如果当前正在执行切换动画，忽略
 			//$.dprint('current is sliding , could not operate manual slide');
 			return false;
@@ -352,6 +352,8 @@ Abe.Slide.prototype = {
 		if(index>=len)
 			index=0;
 		this._switchImage(index);
+		
+		this._ctrl.setCurrent(index);
 	},
 	_switchImage: function(index) {
 		this._sender.preImage = this._buffer[this._curImgIndex];
@@ -363,7 +365,6 @@ Abe.Slide.prototype = {
 		this._slideArray[this._curSlideIndex].startAnimate();
 		this._drawNext();
 
-		this._ctrl.setCurrent(index);
 	},
 	_loadImageFinish: function() {
 		//$.dprint('limgf');
@@ -473,7 +474,7 @@ Abe.SlideControl.prototype={
 			}
 			this._ctx.fillText(tmp+1,b.Left+5,b.Bottom-3);
 			if(tmp===this._cur) {
-				this._ctx.fillRect(b.Left+1,b.Bottom-1,b.Width-2,1);
+				this._ctx.fillRect(b.Left+2,b.Bottom,b.Width-4,2);
 			}
 
 		}
@@ -539,20 +540,22 @@ Abe.SlideControl.prototype={
 			}
 		}
 		if(index!==-1) {
-			if(this._handler[this._start+index]===true){
+			if(this._handler(this._start+index)===true){
 				this._setIndex(this._start+index);
-			}else{
-				$.dprint('sliding wroing!');
 			}
 				
 		}
+	},
+	_dealMouseOut:function(){
+		this._mse_idx=-1;
+		this._repaint();
 	},
 	setMax: function(max) {
 		this._end=max;
 		//$.dprint('max:'+max);
 		this._cur=0;
 		jQuery(this._canvas).bind('mousemove',jQuery.proxy(this._dealMouseMove,this));
-
+		jQuery(this._canvas).bind('mouseout',jQuery.proxy(this._dealMouseOut,this));
 		jQuery(this._canvas).bind('click',jQuery.proxy(this._dealClick,this));
 	},
 	addListener: function(handler) {
