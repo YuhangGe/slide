@@ -21,6 +21,11 @@ var Abe = {};//定义命名空间，所有动画插件的声明都需要在此�
  * 	cursor:{string},鼠标指针样式，默认为pointer,即手形
  * 	openUrl:{boolean},单击后是否打开网页，默认为true，要求loadImages传入的参数有url.
  * 	openNew:{boolean},是否在新窗口中打开网页，默认为true;
+ *	ctrl:{Json}，控件面板的属性。{
+ *									display:{boolean} 是否显示，默认为true,
+ *									background:{string} 背景颜色，默认为'#000000',
+ *									num:{number} 面板上按钮个数，默认为5个 
+ *								 }
  * }
  * */
 Abe.Slide = function(parent,params) {
@@ -37,6 +42,7 @@ Abe.Slide = function(parent,params) {
 	//进行初始化
 	this._init();
 
+	var c_p=null;
 	//解析参数
 	if(params ) {
 		if(typeof params['strength']==='boolean')
@@ -66,7 +72,9 @@ Abe.Slide = function(parent,params) {
 
 		if(typeof params['openNew']==='boolean')
 			this._openNew=params['openNew'];
-
+		
+		if(params['ctrl'])
+			c_p=params['ctrl'];
 		// var to={
 		// 			show:true,
 		// 			bgColor:'black',
@@ -98,7 +106,7 @@ Abe.Slide = function(parent,params) {
 
 	}
 
-	this._ctrl=new Abe.SlideControl(this._ctrl_canvas,'#000000');
+	this._ctrl=new Abe.SlideControl(this._ctrl_canvas,c_p);
 
 	//构造传递给animate组件的参数
 	this._sender = {
@@ -370,7 +378,6 @@ Abe.Slide.prototype = {
 		//$.dprint('limgf');
 		this._ctrl.setMax(this._images.length-1);
 		this._ctrl.addListener(jQuery.proxy( function(index) {
-			$.dprint(this);
 			return this.slideNext(index);
 		},this));
 		this._imgLoaded=true;
@@ -396,20 +403,35 @@ Abe.Slide.prototype = {
 		}
 	}
 }
-
-Abe.SlideControl= function(canvas,background) {
+/**
+ * @param {Canvas} canvas
+ * @param {string} background 背景颜色,默认黑色
+ * @param {number} num 控制按钮的个数，默认5个
+ */
+Abe.SlideControl= function(canvas,params) {
 	this._canvas=canvas;
-	this._bg=background;
+	this._bg="#000000";
+	this._n=5;
+	this._visible=true;
+	if(params!=null){
+		if(typeof params['background']==='string')
+			this._bg=params['background'];
+		if(typeof params['num']==='number')
+			this._n=params['num'];
+		if(typeof params['visible']==='boolean')
+			this._visible=params['visible'];
+	}
+		
 	this._start=0;
 	this._end=0;
 	this._ctx=this._canvas.getContext('2d');
-	this._n=5;//显示5个索引
 	this._hn=Math.floor((this._n-1)/2);
 	this._btns=new Array();
 	this._cur=0;
 	this._mse_idx=-1;//当前鼠标移动到的索引，-1表示没有
 	this._mse_in=false;
-
+	
+	this.setVisible(this._visible);
 	this._init();
 	this._drawBackground();
 
@@ -425,6 +447,15 @@ Abe.SlideControl.prototype={
 		this.isPointInRect= function(x,y) {
 			return (x>=this.Left && x<=this.Right)
 			&& (y>=this.Top && y<=this.Bottom);
+		}
+	},
+	setVisible:function(visible){
+		if(typeof visible==='boolean')
+			this._visible=visible;
+		if(this._visible===true){
+			this._canvas.style.display='';
+		}else{
+			this._canvas.style.display='none';
 		}
 	},
 	_init: function() {
@@ -443,6 +474,8 @@ Abe.SlideControl.prototype={
 		}
 	},
 	_repaint: function() {
+		if(this._visible===false)
+			return;
 		this._canvas.width=this._width;
 		this._drawBackground();
 		this._drawBtn();
@@ -454,14 +487,15 @@ Abe.SlideControl.prototype={
 			this._ctx.globalAlpha=(i-start)/this._width;
 			this._ctx.fillRect(i,0,1,this._height);
 		}
-		this._ctx.strokeStyle='#ff0000';
-		this._ctx.globalAlpha=1;
-		for(var i=0;i<this._n;i++) {
-			var b=this._btns[i];
-			this._ctx.strokeRect(b.Left,b.Top,b.Width,b.Height);
-		}
+//		this._ctx.strokeStyle='#ff0000';
+//		this._ctx.globalAlpha=1;
+//		for(var i=0;i<this._n;i++) {
+//			var b=this._btns[i];
+//			this._ctx.strokeRect(b.Left,b.Top,b.Width,b.Height);
+//		}
 	},
 	_drawBtn: function() {
+		this._ctx.globalAlpha=1;
 		this._ctx.fillStyle='#ffffff';
 
 		for(var i=0;i<this._n;i++) {
@@ -474,7 +508,7 @@ Abe.SlideControl.prototype={
 			}
 			this._ctx.fillText(tmp+1,b.Left+5,b.Bottom-3);
 			if(tmp===this._cur) {
-				this._ctx.fillRect(b.Left+2,b.Bottom,b.Width-4,2);
+				this._ctx.fillRect(b.Left+2,b.Bottom-0.8,b.Width-4,1.2);
 			}
 
 		}

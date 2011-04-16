@@ -3,7 +3,13 @@ var s=null;
 var bg=new Image();
 function do_slide() {
 
-	s= new Abe.Slide('slide_context');
+	s= new Abe.Slide('slide_context',
+	{
+		openNew:false,
+		ctrl:{
+			visible:false
+		}
+	});
 	// s= new Abe.Slide('slide_context',
 	// 	{
 	// 		strength:true,
