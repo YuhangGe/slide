@@ -5,9 +5,11 @@ function do_slide() {
 
 	s= new Abe.Slide('slide_context',
 	{
-		openNew:false,
+		autoSlide:false,
 		ctrl:{
-			visible:false
+			visible:true,
+			background:'#000000',
+			num:8
 		}
 	});
 	// s= new Abe.Slide('slide_context',
